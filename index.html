@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Equipment Parts Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6E9EC; --panel:#FFFFFF; --ink:#18212B; --muted:#5E6873; --line:#C9CFD5;
+  --tag:#F2C230; --tag-ink:#1A1A12; --steel:#2F6283; --steel-soft:#DCE7EF; --empty:#D5DADF;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151A20; --panel:#1F262E; --ink:#E8ECF0; --muted:#98A3AE; --line:#34404B;
+  --tag:#E9B824; --tag-ink:#16140A; --steel:#7FB3D5; --steel-soft:#24384A; --empty:#2A333C;}}
+:root[data-theme="dark"]{--bg:#151A20; --panel:#1F262E; --ink:#E8ECF0; --muted:#98A3AE; --line:#34404B;
+  --tag:#E9B824; --tag-ink:#16140A; --steel:#7FB3D5; --steel-soft:#24384A; --empty:#2A333C;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--steel);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.wrap{max-width:1400px;margin:0 auto;padding:0 20px}
+.head{display:flex;align-items:center;gap:20px;padding:16px 0 12px;flex-wrap:wrap}
+h1{font-family:var(--cond);font-weight:700;font-size:28px;line-height:1;margin:0;letter-spacing:.2px;white-space:nowrap}
+.brand{display:flex;flex-direction:column;gap:4px}
+.credit{font-size:12.5px;color:var(--muted);letter-spacing:.2px;white-space:nowrap}
+.search{flex:1;min-width:240px;position:relative}
+.search input{width:100%;height:46px;border:2px solid var(--ink);border-radius:6px;background:var(--panel);padding:0 44px 0 14px;font-size:17px}
+.search input::placeholder{color:var(--muted)}
+.clear{position:absolute;right:6px;top:6px;width:34px;height:34px;border:0;background:none;border-radius:4px;cursor:pointer;color:var(--muted);font-size:20px;display:none}
+.clear.on{display:block}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:10px 14px 11px;cursor:pointer;font-family:var(--cond);font-size:19px;font-weight:600;color:var(--muted);border-bottom:4px solid transparent;white-space:nowrap}
+.tab .n{font-family:var(--body);font-size:13px;font-weight:500;margin-left:6px;color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--tag)}
+.tab:hover{color:var(--ink)}
+
+/* toolbar */
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 0 8px}
+.bar select{height:38px;border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:0 10px;max-width:100%}
+.chk{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:15px}
+.chk input{width:18px;height:18px;accent-color:var(--steel)}
+.count{margin-left:auto;color:var(--muted);font-size:15px}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:0 12px;height:36px;cursor:pointer;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* section heading */
+.sec{font-family:var(--cond);font-size:22px;font-weight:600;margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
+.sec small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;text-align:left;padding:0}
+.card:hover{border-color:var(--steel)}
+.ph{aspect-ratio:4/3;background:var(--empty);position:relative;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .none{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
+.tagpn{display:inline-block;background:var(--tag);color:var(--tag-ink);font-family:var(--cond);font-weight:700;font-size:19px;line-height:1;padding:5px 8px 4px;border-radius:2px;letter-spacing:.3px;word-break:break-all}
+.card .meta{padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px}
+.card .meta .tagpn{align-self:flex-start}
+.card .desc{font-size:14.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card .where{font-size:12.5px;color:var(--muted)}
+
+/* list */
+.list{background:var(--panel);border:1px solid var(--line);border-radius:4px}
+.row{display:grid;grid-template-columns:72px 190px 1fr auto;gap:14px;align-items:center;padding:6px 12px 6px 6px;border-bottom:1px solid var(--line);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--steel-soft)}
+.row .ph{width:72px;border-radius:2px}
+.row .ph .none{font-size:11px}
+.row .where{color:var(--muted);font-size:13px;text-align:right}
+@media (max-width:700px){.row{grid-template-columns:64px 1fr}.row .ph{width:64px;grid-row:span 2}.row .where{text-align:left;grid-column:2}.row .desc{grid-column:2}}
+
+.empty{padding:60px 20px;text-align:center;color:var(--muted)}
+.empty .alt{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+
+/* detail */
+dialog{border:0;padding:0;background:var(--panel);color:var(--ink);width:min(980px,96vw);max-height:92vh;border-radius:6px;overflow:hidden}
+dialog::backdrop{background:rgba(10,14,18,.72)}
+.dl{display:grid;grid-template-columns:1.5fr 1fr;max-height:92vh}
+.dl .big{background:#0E1216;display:grid;place-items:center;min-height:300px}
+.dl .big img{max-width:100%;max-height:78vh;display:block}
+.dl .big .none{color:#9AA5B0}
+.dl .info{padding:22px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+.dl .tagpn{font-size:30px;padding:8px 12px 6px;align-self:flex-start}
+.dl .d{font-size:18px;line-height:1.45}
+.dl dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px}
+.dl dt{color:var(--muted);white-space:nowrap} .dl dd{margin:0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.btn{height:40px;padding:0 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);cursor:pointer;font-size:15px}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.x{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:22px;cursor:pointer;z-index:2}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:26px;cursor:pointer}
+.nav.p{left:0;border-radius:0 6px 6px 0} .nav.n{right:0;border-radius:6px 0 0 6px}
+.bigwrap{position:relative}
+@media (max-width:560px){.grid{grid-template-columns:repeat(2,1fr);gap:10px}.card .tagpn{font-size:16px}.card .desc{font-size:13.5px}.card .meta{padding:8px 9px 10px}.wrap{padding:0 12px}}
+@media (max-width:760px){.dl{grid-template-columns:1fr;overflow:auto}.dl .big img{max-height:55vh}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;font-size:15px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:100}
+.toast.on{opacity:1}
+main{padding-bottom:60px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="head">
+      <div class="brand"><h1>Parts Catalog</h1><div class="credit">created by Edgardo Diaz</div></div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Search part number or description" autocomplete="off" aria-label="Search parts">
+        <button class="clear" id="clr" aria-label="Clear search">×</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Equipment"></nav>
+  </div>
+</header>
+<main class="wrap">
+  <div class="bar">
+    <select id="sec" aria-label="Section"></select>
+    <label class="chk"><input type="checkbox" id="photo"> Only parts with photos</label>
+    <div class="seg" role="group" aria-label="View">
+      <button id="vg" aria-pressed="true">Grid</button><button id="vl" aria-pressed="false">List</button>
+    </div>
+    <span class="count" id="count"></span>
+  </div>
+  <div id="out"></div>
+</main>
+
+<dialog id="dlg" aria-label="Part detail">
+  <button class="x" id="dx" aria-label="Close">×</button>
+  <div class="dl">
+    <div class="bigwrap"><div class="big" id="dbig"></div>
+      <button class="nav p" id="dp" aria-label="Previous part">‹</button>
+      <button class="nav n" id="dn" aria-label="Next part">›</button></div>
+    <div class="info">
+      <span class="tagpn" id="dpn"></span>
+      <div class="d" id="dd"></div>
+      <dl id="dmeta"></dl>
+      <div class="acts">
+        <button class="btn primary" id="dcopy">Copy part number</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="parts-data.js"></script>
+<script>
+(function(){
+const DATA=window.PARTS_DATA;
+if(!DATA){document.body.innerHTML='<p style="padding:40px;font-family:sans-serif">parts-data.js was not found. Keep index.html, parts-data.js and the images folder together in the same folder.</p>';return}
+const EXT=['.jpg','.JPG','.jpeg','.png','.PNG','.webp'];
+const fileOf=it=>'images/'+encodeURIComponent(it.pn.trim());
+const src=it=>it.ok||null;
+// flatten
+const ALL=[];
+DATA.groups.forEach(g=>g.items.forEach(it=>{it.g=g.name;it.ok=null;it.hay=(it.pn+' '+it.d+' '+it.s+' '+(it.bin||'')+' '+(it.x||[]).map(r=>r[1]).join(' ')).toLowerCase();ALL.push(it)}));
+const TABS=[{name:'All equipment',items:ALL.filter(i=>i.g!=='Other Photos')}].concat(DATA.groups);
+const st={tab:0,q:'',sec:'',photo:false,view:'grid'};
+try{const v=localStorage.getItem('pc-view');if(v)st.view=v;const p=localStorage.getItem('pc-photo');if(p)st.photo=p==='1'}catch(e){}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// lazy images
+const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=e.target;i.src=i.dataset.k;io.unobserve(i)}}),{rootMargin:'400px'}):null;
+
+function renderTabs(){
+  $('tabs').innerHTML=TABS.map((t,i)=>`<button class="tab" role="tab" aria-selected="${i===st.tab}" data-i="${i}">${esc(t.name)}<span class="n">${t.items.length}</span></button>`).join('');
+}
+function renderSecs(){
+  const t=TABS[st.tab]; const secs=[...new Set(t.items.map(i=>i.s).filter(Boolean))];
+  const sel=$('sec');
+  if(!secs.length||st.tab===0){sel.style.display='none';st.sec='';return}
+  sel.style.display='';
+  sel.innerHTML='<option value="">All sections</option>'+secs.map(s=>`<option ${s===st.sec?'selected':''}>${esc(s)}</option>`).join('');
+}
+let current=[];
+function filtered(){
+  const t=TABS[st.tab]; const words=st.q.toLowerCase().split(/\s+/).filter(Boolean);
+  return t.items.filter(i=>(!st.sec||i.s===st.sec)&&(!st.photo||i.ok)&&words.every(w=>i.hay.includes(w)));
+}
+function thumb(it){
+  const s=src(it);
+  return `<div class="ph">${s?`<img alt="" data-k="${esc(s)}" decoding="async">`:'<span class="none">No photo</span>'}</div>`;
+}
+function whereOf(it){const a=[];if(st.tab===0||st.q)a.push(it.g);if(it.s)a.push(it.s);if(it.bin)a.push('Bin '+it.bin);return a.join(', ')}
+function render(){
+  current=filtered();
+  const n=current.length, tot=TABS[st.tab].items.length;
+  $('count').textContent=n===tot?`${n} parts`:`${n} of ${tot} parts`;
+  $('vg').setAttribute('aria-pressed',st.view==='grid');$('vl').setAttribute('aria-pressed',st.view==='list');
+  $('photo').checked=st.photo;
+  if(!n){
+    const words=st.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const elsewhere=words.length?TABS.map((t,i)=>[i,t.name,t.items.filter(x=>(!st.photo||x.ok)&&words.every(w=>x.hay.includes(w))).length]).filter(r=>r[0]!==st.tab&&r[0]!==0&&r[2]):[];
+    $('out').innerHTML=`<div class="empty"><strong>No parts in ${esc(TABS[st.tab].name)} match “${esc(st.q||'this filter')}”</strong>`+
+      (elsewhere.length?`Matches in other equipment:<div class="alt">${elsewhere.map(r=>`<button class="btn" data-goto="${r[0]}">${esc(r[1])} (${r[2]})</button>`).join('')}</div>`:'Try fewer words or turn off “Only parts with photos”.')+`</div>`;return}
+  // group by section when a single equipment tab without search
+  const groupBy=st.tab>0&&!st.q&&!st.sec&&current.some(i=>i.s);
+  const blocks=[];
+  if(groupBy){const m=new Map();current.forEach((it,ix)=>{const k=it.s||'Other';if(!m.has(k))m.set(k,[]);m.get(k).push(ix)});m.forEach((v,k)=>blocks.push([k,v]))}
+  else blocks.push([null,current.map((_,ix)=>ix)]);
+  const cell=ix=>{const it=current[ix];
+    if(st.view==='grid')return `<button class="card" data-ix="${ix}">${thumb(it)}<div class="meta"><span class="tagpn">${esc(it.pn)}</span><span class="desc">${esc(it.d||'No description on file')}</span>${whereOf(it)?`<span class="where">${esc(whereOf(it))}</span>`:''}</div></button>`;
+    return `<button class="row" data-ix="${ix}">${thumb(it)}<span class="tagpn" style="justify-self:start">${esc(it.pn)}</span><span class="desc">${esc(it.d||'No description on file')}</span><span class="where">${esc(whereOf(it))}</span></button>`};
+  $('out').innerHTML=blocks.map(([h,ixs])=>(h?`<h2 class="sec">${esc(h)}<small>${ixs.length}</small></h2>`:'')+`<div class="${st.view==='grid'?'grid':'list'}">${ixs.map(cell).join('')}</div>`).join('');
+  $('out').querySelectorAll('img[data-k]').forEach(i=>io?io.observe(i):(i.src=i.dataset.k));
+}
+function update(){renderTabs();renderSecs();render()}
+
+// detail
+let di=-1;
+function openD(ix){di=ix;const it=current[ix];const s=src(it);
+  $('dbig').innerHTML=s?`<img src="${esc(s)}" alt="Photo of part ${esc(it.pn)}">`:`<span class="none" style="text-align:center;padding:20px">No photo yet.<br>To add one, save it as<br><b>images/${esc(it.pn.trim())}.jpg</b></span>`;
+  $('dpn').textContent=it.pn; $('dd').textContent=it.d||'No description on file';
+  const rows=[['Equipment',it.g],['Photo file',s?decodeURIComponent(s):'images/'+it.pn.trim()+'.jpg (missing)']]; if(it.s)rows.push(['Section',it.s]); if(it.bin)rows.push(['Bin',it.bin]);(it.x||[]).forEach(r=>rows.push(r));
+  $('dmeta').innerHTML=rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('');
+  $('dp').style.visibility=ix>0?'visible':'hidden';$('dn').style.visibility=ix<current.length-1?'visible':'hidden';
+  if(!$('dlg').open)$('dlg').showModal();
+}
+$('out').addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g){st.tab=+g.dataset.goto;st.sec='';update();return}const b=e.target.closest('[data-ix]');if(b)openD(+b.dataset.ix)});
+$('dx').onclick=()=>$('dlg').close();
+$('dlg').addEventListener('click',e=>{if(e.target===$('dlg'))$('dlg').close()});
+$('dp').onclick=()=>di>0&&openD(di-1);$('dn').onclick=()=>di<current.length-1&&openD(di+1);
+document.addEventListener('keydown',e=>{if(!$('dlg').open){if(e.key==='/'&&document.activeElement!==$('q')){e.preventDefault();$('q').focus()}return}
+  if(e.key==='ArrowLeft')$('dp').click();if(e.key==='ArrowRight')$('dn').click()});
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),1600)}
+$('dcopy').onclick=()=>{const pn=current[di].pn;
+  const done=()=>toast('Copied '+pn);
+  if(navigator.clipboard)navigator.clipboard.writeText(pn).then(done,()=>fallback());else fallback();
+  function fallback(){const ta=document.createElement('textarea');ta.value=pn;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Copy not available')}ta.remove()}};
+
+// controls
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;st.tab=+b.dataset.i;st.sec='';update();window.scrollTo(0,0)});
+let qt;$('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{st.q=e.target.value.trim();$('clr').classList.toggle('on',!!st.q);render()},120)});
+$('clr').onclick=()=>{$('q').value='';st.q='';$('clr').classList.remove('on');render();$('q').focus()};
+$('sec').onchange=e=>{st.sec=e.target.value;render()};
+$('photo').onchange=e=>{st.photo=e.target.checked;try{localStorage.setItem('pc-photo',st.photo?'1':'0')}catch(x){}render()};
+$('vg').onclick=()=>{st.view='grid';try{localStorage.setItem('pc-view','grid')}catch(x){}render()};
+$('vl').onclick=()=>{st.view='list';try{localStorage.setItem('pc-view','list')}catch(x){}render()};
+// find which photos exist in the images folder
+function probe(it){return new Promise(res=>{let k=0;const base=fileOf(it);
+  const tryNext=()=>{if(k>=EXT.length){res();return}const u=base+EXT[k++];const im=new Image();
+    im.onload=()=>{it.ok=u;res()};im.onerror=tryNext;im.src=u};tryNext()})}
+$('count').textContent='Checking photos…';
+update();
+(async()=>{const seen=new Map();const list=[];ALL.forEach(it=>{const k=it.pn.trim().toUpperCase();if(!seen.has(k)){seen.set(k,it);list.push(it)}});
+  for(let i=0;i<list.length;i+=40)await Promise.all(list.slice(i,i+40).map(probe));
+  ALL.forEach(it=>{if(!it.ok){const m=seen.get(it.pn.trim().toUpperCase());if(m)it.ok=m.ok}});
+  update()})();
+})();
+</script>
+</body>
+</html>

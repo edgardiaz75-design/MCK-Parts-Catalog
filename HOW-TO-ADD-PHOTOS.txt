@@ -1,0 +1,18 @@
+PARTS CATALOG - HOW TO USE AND UPDATE
+
+OPEN IT
+  Double-click index.html. It opens in your web browser and works offline.
+  Keep index.html, parts-data.js and the "images" folder together in the same folder.
+
+ADD OR REPLACE A PHOTO
+  1. Take the photo.
+  2. Name the file exactly the part number, for example:  XVT-1500.jpg
+  3. Put it in the "images" folder (replace the old file if one exists).
+  4. Refresh the browser page (F5). The photo appears automatically.
+
+  Accepted file types: .jpg  .jpeg  .png  .webp
+  Tip: in the catalog, click a part with no photo - it shows the exact file name to use.
+
+ADD OR CHANGE PARTS IN THE LIST
+  The list of parts is in parts-data.js. It can be edited in Notepad, but the easiest way
+  is to send the updated Excel parts list to Claude and ask for the catalog to be rebuilt.
