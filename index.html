@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Equipment Parts Catalog</title>
+<title>Parts Catalog v1.0</title>
+<!-- Parts Catalog | Developed & Maintained by Edgardo Diaz | Version 1.0 | Updated Oct 17, 2026 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
@@ -34,6 +35,7 @@ button,input,select{font:inherit;color:inherit}
 h1{font-family:var(--cond);font-weight:700;font-size:28px;line-height:1;margin:0;letter-spacing:.2px;white-space:nowrap}
 .brand{display:flex;flex-direction:column;gap:4px}
 .credit{font-size:12.5px;color:var(--muted);letter-spacing:.2px;white-space:nowrap}
+.credit.ver{font-size:11.5px;opacity:.85}
 .search{flex:1;min-width:240px;position:relative}
 .search input{width:100%;height:46px;border:2px solid var(--ink);border-radius:6px;background:var(--panel);padding:0 44px 0 14px;font-size:17px}
 .search input::placeholder{color:var(--muted)}
@@ -118,7 +120,7 @@ main{padding-bottom:60px}
 <header class="top">
   <div class="wrap">
     <div class="head">
-      <div class="brand"><h1>Parts Catalog</h1><div class="credit">created by Edgardo Diaz</div></div>
+      <div class="brand"><h1>Parts Catalog</h1><div class="credit">Developed &amp; Maintained by Edgardo Diaz</div><div class="credit ver">Version 1.0 · Updated Oct 17, 2026</div></div>
       <div class="search">
         <input id="q" type="search" placeholder="Search part number or description" autocomplete="off" aria-label="Search parts">
         <button class="clear" id="clr" aria-label="Clear search">×</button>
@@ -167,7 +169,7 @@ const fileOf=it=>'images/'+encodeURIComponent(it.pn.trim());
 const src=it=>it.ok||null;
 // flatten
 const ALL=[];
-DATA.groups.forEach(g=>g.items.forEach(it=>{it.g=g.name;it.ok=null;it.hay=(it.pn+' '+it.d+' '+it.s+' '+(it.bin||'')+' '+(it.x||[]).map(r=>r[1]).join(' ')).toLowerCase();ALL.push(it)}));
+DATA.groups.forEach(g=>g.items.forEach(it=>{it.g=g.name;it.ok=undefined;it.hay=(it.pn+' '+it.d+' '+it.s+' '+(it.bin||'')+' '+(it.x||[]).map(r=>r[1]).join(' ')).toLowerCase();ALL.push(it)}));
 const TABS=[{name:'All equipment',items:ALL.filter(i=>i.g!=='Other Photos')}].concat(DATA.groups);
 const st={tab:0,q:'',sec:'',photo:false,view:'grid'};
 try{const v=localStorage.getItem('pc-view');if(v)st.view=v;const p=localStorage.getItem('pc-photo');if(p)st.photo=p==='1'}catch(e){}
@@ -193,9 +195,17 @@ function filtered(){
   return t.items.filter(i=>(!st.sec||i.s===st.sec)&&(!st.photo||i.ok)&&words.every(w=>i.hay.includes(w)));
 }
 function thumb(it){
-  const s=src(it);
-  return `<div class="ph">${s?`<img alt="" data-k="${esc(s)}" decoding="async">`:'<span class="none">No photo</span>'}</div>`;
+  if(it.ok===false)return '<div class="ph"><span class="none">No photo</span></div>';
+  const s=it.ok||fileOf(it)+EXT[0];
+  return `<div class="ph"><img alt="" data-k="${esc(s)}" data-pn="${esc(it.pn.trim().toUpperCase())}" data-t="${it.ok?EXT.length:1}" decoding="async"></div>`;
 }
+const BYPN=new Map();ALL.forEach(it=>{const k=it.pn.trim().toUpperCase();if(!BYPN.has(k))BYPN.set(k,[]);BYPN.get(k).push(it)});
+const setOk=(pn,v)=>(BYPN.get(pn)||[]).forEach(it=>{it.ok=v});
+document.addEventListener('load',e=>{const i=e.target;if(i.tagName==='IMG'&&i.dataset.pn)setOk(i.dataset.pn,i.getAttribute('src'))},true);
+document.addEventListener('error',e=>{const i=e.target;if(i.tagName!=='IMG'||!i.dataset.pn)return;
+  const t=+i.dataset.t; const it=(BYPN.get(i.dataset.pn)||[])[0];
+  if(it&&t<EXT.length){i.dataset.t=t+1;i.src=fileOf(it)+EXT[t];return}
+  setOk(i.dataset.pn,false);const sp=document.createElement('span');sp.className='none';sp.textContent='No photo';i.replaceWith(sp)},true);
 function whereOf(it){const a=[];if(st.tab===0||st.q)a.push(it.g);if(it.s)a.push(it.s);if(it.bin)a.push('Bin '+it.bin);return a.join(', ')}
 function render(){
   current=filtered();
@@ -223,10 +233,12 @@ function update(){renderTabs();renderSecs();render()}
 
 // detail
 let di=-1;
-function openD(ix){di=ix;const it=current[ix];const s=src(it);
-  $('dbig').innerHTML=s?`<img src="${esc(s)}" alt="Photo of part ${esc(it.pn)}">`:`<span class="none" style="text-align:center;padding:20px">No photo yet.<br>To add one, save it as<br><b>images/${esc(it.pn.trim())}.jpg</b></span>`;
+function openD(ix){di=ix;const it=current[ix];const s=it.ok===false?null:(it.ok||fileOf(it)+EXT[0]);
+  const noPh=`<span class="none" style="text-align:center;padding:20px">No photo yet.<br>To add one, save it as<br><b>images/${esc(it.pn.trim())}.jpg</b></span>`;
+  $('dbig').innerHTML=s?`<img src="${esc(s)}" alt="Photo of part ${esc(it.pn)}">`:noPh;
+  const bi=$('dbig').querySelector('img'); if(bi){let t=it.ok?EXT.length:1;bi.onerror=()=>{if(t<EXT.length){bi.src=fileOf(it)+EXT[t++]}else{$('dbig').innerHTML=noPh}};bi.onload=()=>setOk(it.pn.trim().toUpperCase(),bi.getAttribute('src'))}
   $('dpn').textContent=it.pn; $('dd').textContent=it.d||'No description on file';
-  const rows=[['Equipment',it.g],['Photo file',s?decodeURIComponent(s):'images/'+it.pn.trim()+'.jpg (missing)']]; if(it.s)rows.push(['Section',it.s]); if(it.bin)rows.push(['Bin',it.bin]);(it.x||[]).forEach(r=>rows.push(r));
+  const rows=[['Equipment',it.g],['Photo file',typeof it.ok==='string'?decodeURIComponent(it.ok):'images/'+it.pn.trim()+'.jpg'+(it.ok===false?' (missing)':'')]]; if(it.s)rows.push(['Section',it.s]); if(it.bin)rows.push(['Bin',it.bin]);(it.x||[]).forEach(r=>rows.push(r));
   $('dmeta').innerHTML=rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('');
   $('dp').style.visibility=ix>0?'visible':'hidden';$('dn').style.visibility=ix<current.length-1?'visible':'hidden';
   if(!$('dlg').open)$('dlg').showModal();
@@ -254,13 +266,13 @@ $('vl').onclick=()=>{st.view='list';try{localStorage.setItem('pc-view','list')}c
 // find which photos exist in the images folder
 function probe(it){return new Promise(res=>{let k=0;const base=fileOf(it);
   const tryNext=()=>{if(k>=EXT.length){res();return}const u=base+EXT[k++];const im=new Image();
-    im.onload=()=>{it.ok=u;res()};im.onerror=tryNext;im.src=u};tryNext()})}
-$('count').textContent='Checking photos…';
+    im.onload=()=>{setOk(it.pn.trim().toUpperCase(),u);res()};im.onerror=tryNext;im.src=u};if(typeof it.ok==='string'||it.ok===false){res();return}tryNext()})}
+
 update();
 (async()=>{const seen=new Map();const list=[];ALL.forEach(it=>{const k=it.pn.trim().toUpperCase();if(!seen.has(k)){seen.set(k,it);list.push(it)}});
   for(let i=0;i<list.length;i+=40)await Promise.all(list.slice(i,i+40).map(probe));
-  ALL.forEach(it=>{if(!it.ok){const m=seen.get(it.pn.trim().toUpperCase());if(m)it.ok=m.ok}});
-  update()})();
+  ALL.forEach(it=>{const m=seen.get(it.pn.trim().toUpperCase());if(m&&it.ok===undefined)it.ok=m.ok||false});
+  if(st.photo)render()})();
 })();
 </script>
 </body>
